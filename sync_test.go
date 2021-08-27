@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"testing"
 
 	cloudflare "github.com/cloudflare/cloudflare-go"
@@ -8,17 +9,17 @@ import (
 )
 
 type mockAPI struct {
-	listZones func(z ...string) ([]cloudflare.Zone, error)
+	listZones func(context.Context, ...string) ([]cloudflare.Zone, error)
 }
 
-func (m mockAPI) ListZones(z ...string) ([]cloudflare.Zone, error) {
-	return m.listZones(z...)
+func (m mockAPI) ListZones(ctx context.Context, z ...string) ([]cloudflare.Zone, error) {
+	return m.listZones(ctx, z...)
 }
 
 func TestFindZoneID(t *testing.T) {
 	t.Run("subdomain", func(t *testing.T) {
-		zoneID, err := findZoneID(mockAPI{
-			listZones: func(z ...string) ([]cloudflare.Zone, error) {
+		zoneID, err := findZoneID(context.TODO(), mockAPI{
+			listZones: func(_ context.Context, z ...string) ([]cloudflare.Zone, error) {
 				return []cloudflare.Zone{
 					{ID: "1", Name: "example.com"},
 				}, nil
@@ -28,8 +29,8 @@ func TestFindZoneID(t *testing.T) {
 		assert.Equal(t, "1", zoneID)
 	})
 	t.Run("domain", func(t *testing.T) {
-		zoneID, err := findZoneID(mockAPI{
-			listZones: func(z ...string) ([]cloudflare.Zone, error) {
+		zoneID, err := findZoneID(context.TODO(), mockAPI{
+			listZones: func(_ context.Context, z ...string) ([]cloudflare.Zone, error) {
 				return []cloudflare.Zone{
 					{ID: "1", Name: "example.com"},
 				}, nil
@@ -39,8 +40,8 @@ func TestFindZoneID(t *testing.T) {
 		assert.Equal(t, "1", zoneID)
 	})
 	t.Run("partial domain", func(t *testing.T) {
-		zoneID, err := findZoneID(mockAPI{
-			listZones: func(z ...string) ([]cloudflare.Zone, error) {
+		zoneID, err := findZoneID(context.TODO(), mockAPI{
+			listZones: func(_ context.Context, z ...string) ([]cloudflare.Zone, error) {
 				return []cloudflare.Zone{
 					{ID: "1", Name: "example.com"}, // a bare suffix match would inadvertently match this domain
 					{ID: "2", Name: "anotherexample.com"},
@@ -51,8 +52,8 @@ func TestFindZoneID(t *testing.T) {
 		assert.Equal(t, "2", zoneID)
 	})
 	t.Run(".co.uk", func(t *testing.T) {
-		zoneID, err := findZoneID(mockAPI{
-			listZones: func(z ...string) ([]cloudflare.Zone, error) {
+		zoneID, err := findZoneID(context.TODO(), mockAPI{
+			listZones: func(_ context.Context, z ...string) ([]cloudflare.Zone, error) {
 				return []cloudflare.Zone{
 					{ID: "1", Name: "example.co.uk"},
 				}, nil

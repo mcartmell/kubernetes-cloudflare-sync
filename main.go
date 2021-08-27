@@ -18,29 +18,26 @@ import (
 )
 
 var options = struct {
-	CloudflareAPIEmail string
-	CloudflareAPIKey   string
-	CloudflareProxy    string
-	CloudflareTTL      string
-	DNSName            string
-	UseInternalIP      bool
-  SkipExternalIP     bool
-	NodeSelector       string
+	CloudflareToken string
+	CloudflareProxy string
+	CloudflareTTL   string
+	DNSName         string
+	UseInternalIP   bool
+	SkipExternalIP  bool
+	NodeSelector    string
 }{
-	CloudflareAPIEmail: os.Getenv("CF_API_EMAIL"),
-	CloudflareAPIKey:   os.Getenv("CF_API_KEY"),
-	CloudflareProxy:    os.Getenv("CF_PROXY"),
-	CloudflareTTL:      os.Getenv("CF_TTL"),
-	DNSName:            os.Getenv("DNS_NAME"),
-	UseInternalIP:      os.Getenv("USE_INTERNAL_IP") != "",
-	SkipExternalIP:     os.Getenv("SKIP_EXTERNAL_IP") != "",
-	NodeSelector:       os.Getenv("NODE_SELECTOR"),
+	CloudflareToken: os.Getenv("CF_TOKEN"),
+	CloudflareProxy: os.Getenv("CF_PROXY"),
+	CloudflareTTL:   os.Getenv("CF_TTL"),
+	DNSName:         os.Getenv("DNS_NAME"),
+	UseInternalIP:   os.Getenv("USE_INTERNAL_IP") != "",
+	SkipExternalIP:  os.Getenv("SKIP_EXTERNAL_IP") != "",
+	NodeSelector:    os.Getenv("NODE_SELECTOR"),
 }
 
 func main() {
 	flag.StringVar(&options.DNSName, "dns-name", options.DNSName, "the dns name for the nodes, comma-separated for multiple (same root)")
-	flag.StringVar(&options.CloudflareAPIEmail, "cloudflare-api-email", options.CloudflareAPIEmail, "the email address to use for cloudflare")
-	flag.StringVar(&options.CloudflareAPIKey, "cloudflare-api-key", options.CloudflareAPIKey, "the key to use for cloudflare")
+	flag.StringVar(&options.CloudflareToken, "cloudflare-token", options.CloudflareToken, "the API token to use for cloudflare")
 	flag.StringVar(&options.CloudflareProxy, "cloudflare-proxy", options.CloudflareProxy, "enable cloudflare proxy on dns (default false)")
 	flag.StringVar(&options.CloudflareTTL, "cloudflare-ttl", options.CloudflareTTL, "ttl for dns (default 120)")
 	flag.BoolVar(&options.UseInternalIP, "use-internal-ip", options.UseInternalIP, "use internal ips too if external ip's are not available")
@@ -48,13 +45,9 @@ func main() {
 	flag.StringVar(&options.NodeSelector, "node-selector", options.NodeSelector, "node selector query")
 	flag.Parse()
 
-	if options.CloudflareAPIEmail == "" {
+	if options.CloudflareToken == "" {
 		flag.Usage()
-		log.Fatalln("cloudflare api email is required")
-	}
-	if options.CloudflareAPIKey == "" {
-		flag.Usage()
-		log.Fatalln("cloudflare api key is required")
+		log.Fatalln("cloudflare api tokenis required")
 	}
 
 	dnsNames := strings.Split(options.DNSName, ",")
