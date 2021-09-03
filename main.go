@@ -47,7 +47,7 @@ func main() {
 
 	if options.CloudflareToken == "" {
 		flag.Usage()
-		log.Fatalln("cloudflare api tokenis required")
+		log.Fatalln("cloudflare api token is required")
 	}
 
 	dnsNames := strings.Split(options.DNSName, ",")
