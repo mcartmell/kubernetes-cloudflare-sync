@@ -37,14 +37,14 @@ spec:
       containers:
       - name: kubernetes-cloudflare-sync
         image: gcr.io/PROJECT_ID/kubernetes-cloudflare-sync
-        args:
-        - --dns-name=kubernetes.example.com
         env:
-        - name: CF_API_KEY
+        - name: DNS_NAME
+          value: kubernetes.example.com
+        - name: CF_TOKEN
           valueFrom:
             secretKeyRef:
               name: cloudflare
-              key: api-key
+              key: api-token
         - name: CF_API_EMAIL
           valueFrom:
             secretKeyRef:
@@ -59,7 +59,7 @@ The app needs two types of permissions:
 
 The former requires just the API keys from cloudflare. We can store them as secret in the cluster by running:
 
-`kubectl create secret generic cloudflare --from-literal=email=YOUR_CLOUDFLARE_ACCOUNT_EMAIL_ADDRESS_HERE --from-literal=api-key=YOUR_CLOUDFLARE_GLOBAL_API_KEY_HERE`
+`kubectl create secret generic cloudflare --from-literal=email=YOUR_CLOUDFLARE_ACCOUNT_EMAIL_ADDRESS_HERE --from-literal=api-token=YOUR_CLOUDFLARE_GLOBAL_API_KEY_HERE`
 
 For the latter we create a `clusterrolebinding` in our cluster by running:
 
@@ -102,7 +102,7 @@ Applying all configs by running:
 
 #### ENV
 * ```CF_API_EMAIL``` The email address to use for cloudflare
-* ```CF_API_KEY``` The key to use for cloudflare
+* ```CF_TOKEN``` The key to use for cloudflare
 * ```CF_PROXY``` Enable cloudflare proxy on dns (default false)
 * ```CF_TTL``` TTL for dns (default 120)
 * ```DNS_NAME``` The dns name for the nodes, comma-separated for multiple (same root)
